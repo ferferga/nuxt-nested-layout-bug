@@ -59,33 +59,7 @@
               <v-icon>mdi-repeat-off</v-icon>
             </v-btn>
           </div>
-          <v-slider
-            :value="sliderValue"
-            hide-details
-            :max="runtime"
-            validate-on-blur
-            thumb-label
-            :step="0"
-            @end="onPositionChange"
-            @change="onPositionChange"
-            @mousedown="onClick"
-            @mouseup="onClick"
-            @input="onInputChange"
-          >
-            <template #prepend>
-              <span class="mt-1">
-                {{ getRuntime(realPosition) }}
-              </span>
-            </template>
-            <template #thumb-label>
-              {{ getRuntime(sliderValue) }}
-            </template>
-            <template #append>
-              <span class="mt-1">
-                {{ getRuntime(runtime) }}
-              </span>
-            </template>
-          </v-slider>
+          <media-progress-slider />
         </div>
       </v-col>
       <v-col cols="3" class="d-none d-md-flex align-center justify-end">
@@ -125,43 +99,20 @@
 import { ImageType } from '@jellyfin/client-axios';
 import Vue from 'vue';
 import { mapActions, mapGetters } from 'vuex';
-import imageHelper from '~/mixins/imageHelper';
 import timeUtils from '~/mixins/timeUtils';
+import imageHelper from '~/mixins/imageHelper';
 import { PlaybackStatus } from '~/store/playbackManager';
 
 export default Vue.extend({
   mixins: [timeUtils, imageHelper],
-  data() {
-    return {
-      clicked: false,
-      currentInput: 0
-    };
-  },
   computed: {
     ...mapGetters('playbackManager', ['getCurrentItem']),
-    runtime(): number {
-      return this.ticksToMs(this.getCurrentItem.RunTimeTicks) / 1000;
-    },
     isPaused(): boolean {
       return this.$store.state.playbackManager.status === PlaybackStatus.paused;
-    },
-    sliderValue: {
-      get(): number {
-        if (!this.clicked) {
-          return this.$store.state.playbackManager.currentTime;
-        }
-        return this.currentInput;
-      }
-    },
-    realPosition: {
-      get(): number {
-        return this.$store.state.playbackManager.currentTime;
-      }
     }
   },
   methods: {
     ...mapActions('playbackManager', [
-      'changeCurrentTime',
       'setLastItemIndex',
       'resetCurrentItemIndex',
       'setNextTrack',
@@ -175,35 +126,6 @@ export default Vue.extend({
         itemId,
         element
       });
-    },
-    getRuntime(seconds: number): string {
-      const minutes = Math.floor(seconds / 60);
-      seconds = Math.floor(seconds - minutes * 60);
-
-      /**
-       * Formats the second number
-       * E.g. 7 -> 07
-       *
-       * @param {string} seconds Number to format
-       * @returns {string} Formatted seconds number
-       */
-      function formatSeconds(seconds: string): string {
-        return ('0' + seconds).slice(-2);
-      }
-
-      return `${minutes}:${formatSeconds(seconds.toString())}`;
-    },
-    onPositionChange(value: number): void {
-      if (!this.clicked) {
-        this.changeCurrentTime({ time: value });
-      }
-    },
-    onInputChange(value: number): void {
-      this.currentInput = value;
-    },
-    onClick(): void {
-      this.currentInput = this.realPosition;
-      this.clicked = !this.clicked;
     },
     stopPlayback(): void {
       this.setLastItemIndex();
@@ -220,11 +142,3 @@ export default Vue.extend({
   }
 });
 </script>
-
-<style scoped>
-.v-input >>> .v-slider__thumb-container,
-.v-input >>> .v-slider__track-background,
-.v-input >>> .v-slider__track-fill {
-  transition: none !important;
-}
-</style>

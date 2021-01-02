@@ -106,34 +106,7 @@
 
                 <div class="px-4 osd-bottom">
                   <div>
-                    <v-slider
-                      min="0"
-                      :max="runtime"
-                      validate-on-blur
-                      :step="0"
-                      :value="sliderValue"
-                      hide-details
-                      thumb-label
-                      @end="onPositionChange"
-                      @change="onPositionChange"
-                      @mousedown="onClick"
-                      @mouseup="onClick"
-                      @input="onInputChange"
-                    >
-                      <template #prepend>
-                        <span class="mt-1">
-                          {{ getRuntime(realPosition) }}
-                        </span>
-                      </template>
-                      <template #thumb-label>
-                        {{ getRuntime(sliderValue) }}
-                      </template>
-                      <template #append>
-                        <span class="mt-1">
-                          {{ getRuntime(runtime) }}
-                        </span>
-                      </template>
-                    </v-slider>
+                    <media-progress-slider />
                     <div class="d-flex justify-space-between">
                       <div>
                         <v-btn icon @click="setPreviousTrack">
@@ -187,17 +160,14 @@ export default Vue.extend({
   mixins: [timeUtils],
   data() {
     return {
-      supportedFeatures: {} as SupportedFeaturesInterface,
-      clicked: false,
-      currentInput: 0
+      supportedFeatures: {} as SupportedFeaturesInterface
     };
   },
   computed: {
     ...mapGetters('playbackManager', [
       'getCurrentItem',
       'getPreviousItem',
-      'getCurrentlyPlayingMediaType',
-      'getCurrentlyPlayingType'
+      'getCurrentlyPlayingMediaType'
     ]),
     isPlaying(): boolean {
       return (
@@ -210,12 +180,6 @@ export default Vue.extend({
     isMinimized(): boolean {
       return this.$store.state.playbackManager.isMinimized;
     },
-    currentPosition(): number {
-      return this.$store.state.playbackManager.currentTime;
-    },
-    runtime(): number {
-      return this.ticksToMs(this.getCurrentItem.RunTimeTicks) / 1000;
-    },
     currentItemName(): string {
       switch (this.getCurrentItem.Type) {
         case 'Episode':
@@ -223,19 +187,6 @@ export default Vue.extend({
         case 'Movie':
         default:
           return this.getCurrentItem.Name;
-      }
-    },
-    sliderValue: {
-      get(): number {
-        if (!this.clicked) {
-          return this.$store.state.playbackManager.currentTime;
-        }
-        return this.currentInput;
-      }
-    },
-    realPosition: {
-      get(): number {
-        return this.$store.state.playbackManager.currentTime;
       }
     }
   },
@@ -360,10 +311,8 @@ export default Vue.extend({
       'setNextTrack',
       'setPreviousTrack',
       'setLastItemIndex',
-      'resetLastItemIndex',
       'pause',
-      'unpause',
-      'changeCurrentTime'
+      'unpause'
     ]),
     getContentClass(): string {
       return `player ${
@@ -383,38 +332,6 @@ export default Vue.extend({
       } else {
         this.pause();
       }
-    },
-    getRuntime(seconds: number): string {
-      let minutes = Math.floor(seconds / 60);
-      const hours = Math.floor(minutes / 60);
-      minutes = minutes - hours * 60;
-      seconds = Math.floor(seconds - (minutes * 60 + hours * 60 * 60));
-      /**
-       * Formats the second number
-       * E.g. 7 -> 07
-       *
-       * @param {string} seconds Number to format
-       * @returns {string} Formatted seconds number
-       */
-      function formatSeconds(seconds: string): string {
-        return ('0' + seconds).slice(-2);
-      }
-
-      if (hours)
-        return `${hours}:${minutes}:${formatSeconds(seconds.toString())}`;
-      return `${minutes}:${formatSeconds(seconds.toString())}`;
-    },
-    onPositionChange(value: number): void {
-      if (!this.clicked) {
-        this.changeCurrentTime({ time: value });
-      }
-    },
-    onInputChange(value: number): void {
-      this.currentInput = value;
-    },
-    onClick(): void {
-      this.currentInput = this.realPosition;
-      this.clicked = !this.clicked;
     }
   }
 });
