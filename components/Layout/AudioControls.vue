@@ -74,9 +74,11 @@
         <volume-slider />
         <v-tooltip top>
           <template #activator="{ on, attrs }">
-            <v-btn disabled icon class="ml-2" v-bind="attrs" v-on="on">
-              <v-icon>mdi-fullscreen</v-icon>
-            </v-btn>
+            <nuxt-link tag="span" :to="'/playback'">
+              <v-btn icon class="ml-2" v-bind="attrs" v-on="on">
+                <v-icon>mdi-fullscreen</v-icon>
+              </v-btn>
+            </nuxt-link>
           </template>
           <span>{{ $t('fullScreen') }}</span>
         </v-tooltip>

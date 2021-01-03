@@ -189,12 +189,15 @@ const imageHelper = Vue.extend({
 
       if (!isPerson(item)) {
         if (
-          type === ImageType.Backdrop &&
-          item.BackdropImageTags &&
-          item.ImageBlurHashes?.Backdrop &&
-          item.ImageBlurHashes?.Backdrop?.[
-            (item.BackdropImageTags as Array<string>)[index]
-          ]
+          type === ImageType.Backdrop ||
+          (item.BackdropImageTags &&
+            item.ImageBlurHashes?.Backdrop &&
+            item.ImageBlurHashes?.Backdrop?.[
+              (item.BackdropImageTags as Array<string>)[index]
+            ]) ||
+          (item.ImageBlurHashes.Backdrop &&
+            item.ParentBackdropImageTags &&
+            item.ParentBackdropImageTags)
         ) {
           return true;
         } else if (

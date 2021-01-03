@@ -191,6 +191,7 @@ export default Vue.extend({
     }
   },
   created() {
+    console.log('player manager created');
     this.supportedFeatures = getSupportedFeatures();
 
     this.$store.subscribe((mutation, state: AppState) => {
