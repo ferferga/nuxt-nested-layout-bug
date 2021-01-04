@@ -1,5 +1,5 @@
 <template>
-  <v-app ref="app">
+  <empty-layout>
     <backdrop />
     <v-navigation-drawer
       v-model="drawer"
@@ -110,10 +110,7 @@
     >
       <audio-controls />
     </v-footer>
-    <!-- Utilities and global systems -->
-    <snackbar />
-    <player-manager />
-  </v-app>
+  </empty-layout>
 </template>
 
 <script lang="ts">
@@ -124,6 +121,7 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 import { AppState } from '~/store';
 import { PlaybackStatus } from '~/store/playbackManager';
 import { getLibraryIcon } from '~/utils/items';
+import EmptyLayout from '~/layouts/empty.vue';
 
 interface WebSocketMessage {
   MessageType: string;
@@ -137,6 +135,9 @@ interface LayoutButton {
 }
 
 export default Vue.extend({
+  components: {
+    EmptyLayout
+  },
   data() {
     return {
       drawer: false,
