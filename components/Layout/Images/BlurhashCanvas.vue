@@ -52,6 +52,7 @@ export default Vue.extend({
         }
       } catch {
         this.validHash = false;
+        this.$emit('error');
       }
     }
   }
